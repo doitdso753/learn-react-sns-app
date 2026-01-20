@@ -17,9 +17,9 @@
 - **shadcn/ui**  
   Tailwind 기반의 재사용 가능한 UI 컴포넌트
 
-### Mock Server
-- **json-server**  
-  JSON 파일 기반의 Mock REST API 서버
+### Backend
+- **Supabase**  
+  인증, 데이터베이스, 스토리지, 실시간 기능을 제공하는 Backend as a Service
 
 ### Infrastructure
 - **Docker**
@@ -33,13 +33,17 @@
 docker compose up -d sns-app
 ```
 
-## 2. json-server로 Mock API 서버 실행
+## 2. Supabase 서버 실행
 
 ```bash
 # 실행 중인 컨테이너 내부 접속
 docker exec -it sns-app sh
 
-# mock api 서버 실행
-npx json-server server/db.json --host 0.0.0.0 --port 5200
+# 서버 실행
+npx supabase login
+npx supabase init
 ```
 
+---
+Supabase 프로젝트는 7일간 사용하지 않을 경우 중단됩니다.
+재실행 방법: Supabase 대시보드 (https://supabase.com/dashboard/org/oynghaohzdrbbiuaqadh) > 중단된 프로젝트를 클릭해 상세 페이지에 접속 > [Restore project] 버튼 클릭
