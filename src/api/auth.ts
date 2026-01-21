@@ -7,7 +7,7 @@ export async function signUp({ email, password }: { email: string; password: str
     password,
   });
 
-  if (error) throw new Error(error.message);
+  if (error) throw error;
 
   return data;
 }
