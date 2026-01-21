@@ -5,33 +5,35 @@ import { toast } from "sonner";
 import { useState } from "react";
 import { useSignInWithPassword } from "@/hooks/mutations/use-sign-in-with-password.ts";
 import { useSignInWithOAuth } from "@/hooks/mutations/use-sign-in-with-oauth.ts";
-import gitHubLogo from "@/assets/github-mark.svg"
+import gitHubLogo from "@/assets/github-mark.svg";
 import { generateErrorMessage } from "@/lib/error.ts";
 
 export default function SignInPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const { mutate: signInWithPassword } = useSignInWithPassword({
-    onError: (error) => {
-      const message = generateErrorMessage(error);
+  const { mutate: signInWithPassword, isPending: isSignInWithPasswordPending } =
+    useSignInWithPassword({
+      onError: (error) => {
+        const message = generateErrorMessage(error);
 
-      toast.error(message, {
-        position: "top-center",
-      });
+        toast.error(message, {
+          position: "top-center",
+        });
 
-      setPassword("");
-    },
-  });
-  const { mutate: signInWithOAuth } = useSignInWithOAuth({
-    onError: (error) => {
-      const message = generateErrorMessage(error);
+        setPassword("");
+      },
+    });
+  const { mutate: signInWithOAuth, isPending: isSignInWithOAuthPending } =
+    useSignInWithOAuth({
+      onError: (error) => {
+        const message = generateErrorMessage(error);
 
-      toast.error(message, {
-        position: "top-center",
-      });
-    }
-  });
+        toast.error(message, {
+          position: "top-center",
+        });
+      },
+    });
 
   const handleSignInWithPasswordClick = () => {
     if (email.trim() === "") return;
@@ -44,11 +46,14 @@ export default function SignInPage() {
     signInWithOAuth("github");
   }
 
+  const isPending = isSignInWithPasswordPending || isSignInWithOAuthPending;
+
   return (
     <div className="flex flex-col gap-8">
       <div className={"text-xl font-bold"}>로그인</div>
       <div className={"flex flex-col gap-2"}>
         <Input
+          disabled={isPending}
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           type={"email"}
@@ -56,6 +61,7 @@ export default function SignInPage() {
           placeholder={"example@abc.com"}
         />
         <Input
+          disabled={isPending}
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           type={"password"}
@@ -64,10 +70,15 @@ export default function SignInPage() {
         />
       </div>
       <div className={"flex flex-col gap-2"}>
-        <Button className={"w-full"} onClick={handleSignInWithPasswordClick}>
+        <Button
+          disabled={isPending}
+          className={"w-full"}
+          onClick={handleSignInWithPasswordClick}
+        >
           로그인
         </Button>
         <Button
+          disabled={isPending}
           className={"w-full"}
           variant={"outline"}
           onClick={handleSignInWithOAuthClick}
