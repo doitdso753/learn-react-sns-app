@@ -26,7 +26,7 @@ export async function signInWithPassword({ email, password }: { email: string; p
 export async function signInWithOAuth(provider: Provider) {
   const { data, error } = await supabase.auth.signInWithOAuth({ provider });
 
-  if (error) throw new Error(error.message);
+  if (error) throw error;
 
   return data;
 }
