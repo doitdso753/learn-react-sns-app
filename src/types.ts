@@ -2,6 +2,8 @@ import { type Database } from "@/database.types.ts"
 
 export type PostEntity = Database["public"]["Tables"]["post"]["Row"];
 
+export type ProfileEntity = Database["public"]["Tables"]["profile"]["Row"];
+
 export type UseMutationCallback = {
   onMutate?: () => void;
   onSuccess?: () => void;
