@@ -74,6 +74,7 @@ export default function PostEditorModal() {
 
   const handleDeleteImage = (image: Image) => {
     setImages((prevImages) => prevImages.filter((item) => item.previewUrl !== image.previewUrl));
+    URL.revokeObjectURL(image.previewUrl);
   }
 
   useEffect(() => {
@@ -85,7 +86,12 @@ export default function PostEditorModal() {
   }, [content]);
 
   useEffect(() => {
-    if (!isOpen) return;
+    if (!isOpen) {
+      images.map((image) => {
+        URL.revokeObjectURL(image.previewUrl);
+      });
+      return;
+    }
 
     if (contentTextAreaRef?.current) {
       contentTextAreaRef.current.focus();
