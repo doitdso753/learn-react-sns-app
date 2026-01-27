@@ -1,0 +1,151 @@
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog.tsx";
+import { Button } from "@/components/ui/button.tsx";
+import { ImageIcon, XIcon } from "lucide-react";
+import { usePostEditorModal } from "@/store/post-editor-modal.ts";
+import { type ChangeEvent, useEffect, useRef, useState } from "react";
+import { useCreatePost } from "@/hooks/mutations/post/use-create-post.ts";
+import { toast } from "sonner";
+import { Carousel, CarouselContent, CarouselItem } from "@/components/ui/carousel.tsx";
+import { useSession } from "@/store/session.ts";
+
+type Image = {
+  file: File;
+  previewUrl: string;
+}
+
+export default function PostEditorModal() {
+  const session = useSession();
+  const { isOpen, close } = usePostEditorModal();
+  const { mutate: createPost, isPending: isCreatePostPending } = useCreatePost({
+    onSuccess: () => {
+      close();
+    },
+    onError: (error) => {
+      toast.error("포스트 생성에 실패했습니다.", {
+        position: "top-center",
+      });
+    },
+  });
+
+  const [content, setContent] = useState("");
+  const [images, setImages] = useState<Image[]>([]);
+  const contentTextAreaRef = useRef<HTMLTextAreaElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleCloseModal = () => {
+    if (content.trim() !== "" || images.length > 0) {
+
+    }
+    
+    close();
+  }
+
+  const handleCreatePostClick = () => {
+    if (content.trim() === "") return;
+    createPost({
+      content,
+      images: images.map((image) => image.file),
+      userId: session!.user.id,
+    });
+    // setContent(""); <== useEffect isOpen에서 처리함
+  }
+
+  const handleSelectImages = (e: ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      const files = Array.from(e.target.files);
+
+      files.forEach((file: File) => {
+        setImages((prev) => [...prev, { file, previewUrl: URL.createObjectURL(file) }]);
+      });
+    }
+
+    e.target.value = "";
+  }
+
+  const handleDeleteImage = (image: Image) => {
+    setImages((prevImages) => prevImages.filter((item) => item.previewUrl !== image.previewUrl));
+  }
+
+  useEffect(() => {
+    if (contentTextAreaRef?.current) {
+      contentTextAreaRef.current.style.height = "auto";
+      contentTextAreaRef.current.style.height =
+        contentTextAreaRef.current.scrollHeight + "px";
+    }
+  }, [content]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    if (contentTextAreaRef?.current) {
+      contentTextAreaRef.current.focus();
+    }
+
+    setContent("");
+    setImages([]);
+  }, [isOpen]);
+
+  return (
+    <Dialog open={isOpen} onOpenChange={handleCloseModal}>
+      <DialogContent className="max-h-[90vh]">
+        <DialogTitle>포스트 작성</DialogTitle>
+        <textarea
+          disabled={isCreatePostPending}
+          ref={contentTextAreaRef}
+          value={content}
+          onChange={(e) => setContent(e.target.value)}
+          className="max-h-105 min-h-25 focus:outline-none"
+          placeholder="무슨 일이 있었나요?"
+        />
+        <input
+          ref={fileInputRef}
+          onChange={handleSelectImages}
+          type="file"
+          accept="image/*"
+          className="hidden"
+          multiple
+        />
+        {images.length > 0 && (
+          <Carousel>
+            <CarouselContent>
+              {images.map((image) => (
+                <CarouselItem key={image.previewUrl} className="basis-2/5">
+                  <div className="relative">
+                    <img
+                      src={image.previewUrl}
+                      className="h-full w-full rounded-sm object-cover"
+                    />
+                    <div
+                      onClick={() => handleDeleteImage(image)}
+                      className="absolute top-0 right-0 m-1 cursor-pointer rounded-full bg-black/30 p-1"
+                    >
+                      <XIcon className="h-4 w-4 text-white" />
+                    </div>
+                  </div>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+          </Carousel>
+        )}
+        <Button
+          disabled={isCreatePostPending}
+          onClick={() => {
+            fileInputRef.current?.click();
+          }}
+          variant="outline"
+          className="cursor-pointer"
+        >
+          <ImageIcon className="h-5 w-5" />
+          이미지 추가
+        </Button>
+        <Button
+          disabled={isCreatePostPending}
+          onClick={handleCreatePostClick}
+          className="cursor-pointer"
+        >
+          저장
+        </Button>
+      </DialogContent>
+    </Dialog>
+  );
+}
