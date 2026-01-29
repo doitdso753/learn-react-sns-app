@@ -12,6 +12,6 @@ export function usePostByIdData ({
   return useQuery({
     queryKey: QUERY_KEYS.post.byId(String(postId)),
     queryFn: () => fetchPostById(postId),
-    enabled: type === "FEED",
+    enabled: type !== "FEED",
   });
 }
