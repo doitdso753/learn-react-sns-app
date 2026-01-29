@@ -9,8 +9,6 @@ export function usePostByIdData ({
   postId: number,
   type: "FEED" | "DETAIL"
 }) {
-  console.log("usePostByIdData", postId, type);
-
   return useQuery({
     queryKey: QUERY_KEYS.post.byId(String(postId)),
     queryFn: () => fetchPostById(postId),
