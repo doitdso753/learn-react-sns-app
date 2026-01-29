@@ -8,8 +8,15 @@ import {
   CarouselItem,
 } from "@/components/ui/carousel";
 import { formatTimeAgo } from "@/lib/time.ts";
+import EditPostButton from "@/components/post/edit-post-button.tsx";
+import { useSession } from "@/store/session.ts";
 
 export default function PostItem(post: Post) {
+  const session = useSession();
+  const userId = session?.user?.id;
+
+  const isMine = post.author_id === userId;
+
   return (
     <div className="flex flex-col gap-4 border-b pb-8">
       <div className="flex justify-between">
@@ -31,14 +38,16 @@ export default function PostItem(post: Post) {
         </div>
 
         <div className="text-muted-foreground flex text-sm">
-          {/* 수정 버튼 */}
-          <Button className="cursor-pointer" variant={"ghost"}>
-            수정
-          </Button>
-          {/* 삭제 버튼 */}
-          <Button className="cursor-pointer" variant={"ghost"}>
-            삭제
-          </Button>
+          {isMine && (
+            <>
+              {/* 수정 버튼 */}
+              <EditPostButton {...post} />
+              {/* 삭제 버튼 */}
+              <Button className="cursor-pointer" variant={"ghost"}>
+                삭제
+              </Button>
+            </>
+          )}
         </div>
       </div>
 

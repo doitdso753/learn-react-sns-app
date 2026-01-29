@@ -1,11 +1,11 @@
 import { CirclePlusIcon } from "lucide-react";
-import { useOpenPostEditorModal } from "@/store/post-editor-modal.ts";
+import { useOpenCreatePostEditorModal } from "@/store/post-editor-modal.ts";
 
 export default function CreatePostButton() {
-  const openPostEditorModal = useOpenPostEditorModal();
+  const openCreatePostEditorModal = useOpenCreatePostEditorModal();
   return (
     <div
-      onClick={openPostEditorModal}
+      onClick={openCreatePostEditorModal}
       className="bg-muted text-muted-foreground cursor-pointer rounded-xl px-6 py-4"
     >
       <div className="flex items-center justify-between">
