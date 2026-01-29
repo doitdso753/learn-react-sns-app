@@ -45,8 +45,6 @@ export default function PostEditorModal() {
     }
   });
 
-  if (!isOpen) return;
-
   const [content, setContent] = useState("");
   const [images, setImages] = useState<Image[]>([]);
   const contentTextAreaRef = useRef<HTMLTextAreaElement>(null);
@@ -55,6 +53,7 @@ export default function PostEditorModal() {
   const isPending = isCreatePostPending || isUpdatePostPending;
 
   const handleCloseModal = () => {
+    if (!postEditorModal.isOpen) return;
     if (postEditorModal.type === "CREATE" && content.trim() !== "" || images.length > 0) {
       openAlertModal({
         title: "게시글 작성이 마무리 되지 않았습니다.",
@@ -71,6 +70,7 @@ export default function PostEditorModal() {
   }
 
   const handleSavePostClick = () => {
+    if (!postEditorModal.isOpen) return;
     if (content.trim() === "") return;
 
     if (postEditorModal.type === "CREATE") {
@@ -154,29 +154,31 @@ export default function PostEditorModal() {
           className="hidden"
           multiple
         />
-        {postEditorModal?.type === "CREATE" && images.length > 0 && (
-          <Carousel>
-            <CarouselContent>
-              {images.map((image) => (
-                <CarouselItem key={image.previewUrl} className="basis-2/5">
-                  <div className="relative">
-                    <img
-                      src={image.previewUrl}
-                      className="h-full w-full rounded-sm object-cover"
-                    />
-                    <div
-                      onClick={() => handleDeleteImage(image)}
-                      className="absolute top-0 right-0 m-1 cursor-pointer rounded-full bg-black/30 p-1"
-                    >
-                      <XIcon className="h-4 w-4 text-white" />
+        {postEditorModal.isOpen &&
+          postEditorModal.type === "CREATE" &&
+          images.length > 0 && (
+            <Carousel>
+              <CarouselContent>
+                {images.map((image) => (
+                  <CarouselItem key={image.previewUrl} className="basis-2/5">
+                    <div className="relative">
+                      <img
+                        src={image.previewUrl}
+                        className="h-full w-full rounded-sm object-cover"
+                      />
+                      <div
+                        onClick={() => handleDeleteImage(image)}
+                        className="absolute top-0 right-0 m-1 cursor-pointer rounded-full bg-black/30 p-1"
+                      >
+                        <XIcon className="h-4 w-4 text-white" />
+                      </div>
                     </div>
-                  </div>
-                </CarouselItem>
-              ))}
-            </CarouselContent>
-          </Carousel>
-        )}
-        {postEditorModal.type === "EDIT" && (
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+            </Carousel>
+          )}
+        {postEditorModal.isOpen && postEditorModal.type === "EDIT" && (
           <Carousel>
             <CarouselContent>
               {(postEditorModal.imageUrls ?? []).map((image) => (
@@ -192,7 +194,7 @@ export default function PostEditorModal() {
             </CarouselContent>
           </Carousel>
         )}
-        {postEditorModal.type === "CREATE" && (
+        {postEditorModal.isOpen && postEditorModal.type === "CREATE" && (
           <Button
             disabled={isPending}
             onClick={() => {
