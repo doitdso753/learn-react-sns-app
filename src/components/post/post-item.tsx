@@ -1,15 +1,15 @@
 import { HeartIcon, MessageCircle } from "lucide-react";
 import type { Post } from "@/types";
 import defaultAvatar from "@/assets/default-avatar.jpg";
-import { Button } from "@/components/ui/button";
 import {
   Carousel,
   CarouselContent,
   CarouselItem,
 } from "@/components/ui/carousel";
 import { formatTimeAgo } from "@/lib/time.ts";
-import EditPostButton from "@/components/post/edit-post-button.tsx";
 import { useSession } from "@/store/session.ts";
+import EditPostButton from "@/components/post/edit-post-button.tsx";
+import DeletePostButton from "@/components/post/delete-post-button.tsx";
 
 export default function PostItem(post: Post) {
   const session = useSession();
@@ -43,9 +43,7 @@ export default function PostItem(post: Post) {
               {/* 수정 버튼 */}
               <EditPostButton {...post} />
               {/* 삭제 버튼 */}
-              <Button className="cursor-pointer" variant={"ghost"}>
-                삭제
-              </Button>
+              <DeletePostButton {...post} />
             </>
           )}
         </div>
