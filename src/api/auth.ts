@@ -1,6 +1,15 @@
 import supabase from "@/lib/supabase.ts";
 import type { Provider } from "@supabase/auth-js/src/lib/types.ts";
 
+export async function signOut() {
+  const { error } = await supabase.auth.signOut();
+
+  if (error) {
+    // 로컬 스토리지에 보관된 엑세스 토큰 제거
+    await supabase.auth.signOut({ scope: "local" });
+  }
+}
+
 export async function signUp({ email, password }: { email: string; password: string }) {
   const { data, error } = await supabase.auth.signUp({
     email,
