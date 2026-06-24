@@ -1,5 +1,4 @@
-import { HeartIcon, Loader, MessageCircle } from "lucide-react";
-import type { Post } from "@/types";
+import { Loader, MessageCircle } from "lucide-react";
 import defaultAvatar from "@/assets/default-avatar.jpg";
 import {
   Carousel,
@@ -12,6 +11,7 @@ import EditPostButton from "@/components/post/edit-post-button.tsx";
 import DeletePostButton from "@/components/post/delete-post-button.tsx";
 import { usePostByIdData } from "@/hooks/queries/use-post-by-id-data.ts";
 import Fallback from "@/components/fallback.tsx";
+import LikePostButton from "@/components/post/like-post-button.tsx";
 
 export default function PostItem({ postId }: { postId: number }) {
   const session = useSession();
@@ -85,10 +85,11 @@ export default function PostItem({ postId }: { postId: number }) {
 
       <div className="flex gap-2">
         {/* 좋아요 버튼 */}
-        <div className="hover:bg-muted flex cursor-pointer items-center gap-2 rounded-xl border p-2 px-4 text-sm">
-          <HeartIcon className="h-4 w-4" />
-          <span>0</span>
-        </div>
+        <LikePostButton
+          id={post.id}
+          likeCount={post.like_count}
+          isLiked={post.isLiked}
+        />
 
         {/* 댓글 버튼 */}
         <div className="hover:bg-muted flex cursor-pointer items-center gap-2 rounded-xl border p-2 px-4 text-sm">
