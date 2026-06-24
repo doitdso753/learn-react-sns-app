@@ -44,6 +44,13 @@ npx supabase login
 npx supabase init
 ```
 
+## 3. 타입 재생성
+supabase database 스키마 기준으로 Typescript Type을 자동으로 생성 해주는 명령어
+
+```bash
+npm run type-gen
+```
+
 ---
 Supabase 프로젝트는 7일간 사용하지 않을 경우 중단됩니다.
 재실행 방법: Supabase 대시보드 (https://supabase.com/dashboard/org/oynghaohzdrbbiuaqadh) > 중단된 프로젝트를 클릭해 상세 페이지에 접속 > [Restore project] 버튼 클릭
