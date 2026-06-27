@@ -22,6 +22,8 @@ export async function deleteImageInPath(path: string) {
     .from(BUCKET_NAME)
     .list(path);
 
+  if (!files || files.length === 0) return;
+
   if (fetchFilesError) throw fetchFilesError;
 
   const paths = files.map((file) => `${path}/${file.name}`);

@@ -1,5 +1,6 @@
 import supabase from "@/lib/supabase.ts";
 import { getRandomNickname } from "@/lib/utils.ts";
+import { deleteImageInPath, uploadImage } from "@/api/image.ts";
 
 export async function fetchProfile(userId: string) {
   const { data, error } = await supabase
@@ -19,6 +20,50 @@ export async function createProfile(userId: string) {
       id: userId,
       nickname: getRandomNickname(),
     })
+    .select()
+    .single();
+
+  if (error) throw error;
+
+  return data;
+}
+
+export async function updateProfile({
+  userId,
+  nickname,
+  bio,
+  avatarImageFile,
+}: {
+  userId: string;
+  nickname?: string;
+  bio?: string;
+  avatarImageFile?: File;
+}) {
+  // 1. 기존 아바타 이미지 삭제
+  if (avatarImageFile) {
+    await deleteImageInPath(`${userId}/avatar`);
+  }
+
+  // 2. 새로운 아바타 이미지 업로드
+  let newAvatarImageUrl;
+  if (avatarImageFile) {
+    const imageExtension = avatarImageFile.name.split(".").pop() || "webp";
+    const filePath = `${userId}/avatar/${Date.now()}-${crypto.randomUUID()}.${imageExtension}`;
+    newAvatarImageUrl = await uploadImage({
+      file: avatarImageFile,
+      filePath,
+    });
+  }
+
+  // 3. 프로필 테이블 업데이트
+  const { data, error } = await supabase
+    .from("profile")
+    .update({
+      nickname,
+      bio,
+      avatar_url: newAvatarImageUrl
+    })
+    .eq("id", userId)
     .select()
     .single();
 

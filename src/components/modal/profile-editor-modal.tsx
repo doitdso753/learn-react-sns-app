@@ -8,6 +8,8 @@ import Loader from "@/components/loader.tsx";
 import defaultAvatar from "@/assets/default-avatar.jpg";
 import { useProfileEditorModal } from "@/store/profile-editor-modal.ts";
 import { type ChangeEvent, useEffect, useRef, useState } from "react";
+import { useUpdateProfile } from "@/hooks/mutations/profile/use-update-profile.ts";
+import { toast } from "sonner";
 
 type Image = {
   file: File;
@@ -16,6 +18,18 @@ type Image = {
 
 export default function ProfileEditorModal() {
   const session = useSession();
+
+  const { mutate: updateProfile, isPending: isUpdateProfilePending } = useUpdateProfile({
+    onSuccess: () => {
+      close();
+    },
+    onError: () => {
+      toast.error("프로필 수정에 실패했습니다.", {
+        position: "top-center"
+      });
+    }
+  })
+
   const {
     data: profile,
     error: fetchProfileError,
@@ -53,6 +67,18 @@ export default function ProfileEditorModal() {
     }
   }, [profile, isOpen]);
 
+  const handleUpdateProfileClick = () => {
+    if (nickname.trim() === "") return;
+
+    updateProfile({
+      userId: session!.user.id,
+      nickname,
+      bio,
+      avatarImageFile: avatarImage?.file,
+    })
+  }
+
+
   const handleSelectImage = (e: ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) return;
     const file = e.target.files[0];
@@ -78,6 +104,7 @@ export default function ProfileEditorModal() {
             <div className="flex flex-col gap-2">
               <div className="text-muted-foreground">프로필 이미지</div>
               <input
+                disabled={isUpdateProfilePending}
                 ref={fileInputRef}
                 onChange={handleSelectImage}
                 type="file"
@@ -90,22 +117,40 @@ export default function ProfileEditorModal() {
                     fileInputRef.current.click();
                   }
                 }}
-                src={avatarImage?.previewUrl || profile?.avatar_url || defaultAvatar}
+                src={
+                  avatarImage?.previewUrl ||
+                  profile?.avatar_url ||
+                  defaultAvatar
+                }
                 className="h-20 w-20 cursor-pointer rounded-full object-cover"
               />
             </div>
 
             <div className="flex flex-col gap-2">
               <div className="text-muted-foreground">닉네임</div>
-              <Input value={nickname} onChange={(e) => setNickname(e.target.value)} />
+              <Input
+                disabled={isUpdateProfilePending}
+                value={nickname}
+                onChange={(e) => setNickname(e.target.value)}
+              />
             </div>
 
             <div className="flex flex-col gap-2">
               <div className="text-muted-foreground">소개</div>
-              <Input value={bio} onChange={(e) => setBio(e.target.value)} />
+              <Input
+                disabled={isUpdateProfilePending}
+                value={bio}
+                onChange={(e) => setBio(e.target.value)}
+              />
             </div>
 
-            <Button className="cursor-pointer">수정하기</Button>
+            <Button
+              disabled={isUpdateProfilePending}
+              onClick={handleUpdateProfileClick}
+              className="cursor-pointer"
+            >
+              수정하기
+            </Button>
           </>
         )}
       </DialogContent>
