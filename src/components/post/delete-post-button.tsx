@@ -3,11 +3,19 @@ import type { PostEntity } from "@/types.ts";
 import { useOpenAlertModal } from "@/store/alert-modal.ts";
 import { useDeletePost } from "@/hooks/mutations/post/use-delete-post.ts";
 import { toast } from "sonner";
+import { useNavigate } from "react-router";
 
 export default function DeletePostButton(props: PostEntity) {
   const openAlertModal = useOpenAlertModal();
+  const navigate = useNavigate();
+
   const { mutate: deletePost, isPending: isDeletePostPending } = useDeletePost({
     onSuccess: () => {
+      const pathname = window.location.pathname;
+
+      if (pathname.startsWith(`/post/${props.id}`)) {
+        navigate("/", { replace: true });
+      }
     },
     onError: (error) => {
       toast.error("포스트 삭제에 실패했습니다.", {
