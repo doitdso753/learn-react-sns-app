@@ -22,7 +22,7 @@ export default function PostFeed({ authorId }: { authorId?: string }) {
   return (
     <div className="flex flex-col gap-10">
       {data?.pages.map((page) =>
-        page.map((id) => <PostItem key={id} postId={id} />),
+        page.map((id) => <PostItem key={id} postId={id} type={"FEED"} />),
       )}
       {isFetchingNextPage && <Loader />}
       <div ref={ref}></div>

@@ -14,7 +14,13 @@ import Fallback from "@/components/fallback.tsx";
 import LikePostButton from "@/components/post/like-post-button.tsx";
 import { Link } from "react-router";
 
-export default function PostItem({ postId }: { postId: number }) {
+export default function PostItem({
+  postId,
+  type
+}: {
+  postId: number;
+  type: "FEED" | "DETAIL";
+}) {
   const session = useSession();
   const userId = session?.user?.id;
 
@@ -22,7 +28,7 @@ export default function PostItem({ postId }: { postId: number }) {
     data: post,
     error,
     isPending,
-  } = usePostByIdData({ postId, type: "FEED" });
+  } = usePostByIdData({ postId, type });
 
   if (isPending) return <Loader />;
   if (error) return <Fallback />;
@@ -30,7 +36,9 @@ export default function PostItem({ postId }: { postId: number }) {
   const isMine = post.author_id === userId;
 
   return (
-    <div className="flex flex-col gap-4 border-b pb-8">
+    <div
+      className={`flex flex-col gap-4 pb-8 ${type === "FEED" && "border-b"}`}
+    >
       <div className="flex justify-between">
         {/* 유저 정보 */}
         <div className="flex items-start gap-4">
@@ -65,9 +73,17 @@ export default function PostItem({ postId }: { postId: number }) {
 
       <div className="flex cursor-pointer flex-col gap-5">
         {/* 컨텐츠 */}
-        <div className="line-clamp-2 wrap-break-word whitespace-pre-wrap">
-          {post.content}
-        </div>
+        {type === "FEED" ? (
+          <Link to={`/post/${post.id}`}>
+            <div className="line-clamp-2 wrap-break-word whitespace-pre-wrap">
+              {post.content}
+            </div>
+          </Link>
+        ) : (
+          <div className="wrap-break-word whitespace-pre-wrap">
+            {post.content}
+          </div>
+        )}
 
         {/* 이미지 캐러셀 */}
         <Carousel>
@@ -95,10 +111,14 @@ export default function PostItem({ postId }: { postId: number }) {
         />
 
         {/* 댓글 버튼 */}
-        <div className="hover:bg-muted flex cursor-pointer items-center gap-2 rounded-xl border p-2 px-4 text-sm">
-          <MessageCircle className="h-4 w-4" />
-          <span>댓글 달기</span>
-        </div>
+        {type === "FEED" && (
+          <Link to={`/post/${post.id}`}>
+            <div className="hover:bg-muted flex cursor-pointer items-center gap-2 rounded-xl border p-2 px-4 text-sm">
+              <MessageCircle className="h-4 w-4" />
+              <span>댓글 달기</span>
+            </div>
+          </Link>
+        )}
       </div>
     </div>
   );
