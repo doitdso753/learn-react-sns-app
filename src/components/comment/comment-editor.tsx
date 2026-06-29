@@ -1,14 +1,33 @@
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
+import useCreateComment from "@/hooks/mutations/comment/use-create-comment.ts";
+import { toast } from "sonner";
 
-export default function CommentEditor() {
+export default function CommentEditor({ postId }: { postId: number}) {
+  const {
+    mutate: createComment,
+    isPending: isCreateCommentPending
+  } = useCreateComment({
+    onSuccess: () => {
+      setContent("");
+    },
+    onError: () => {
+      toast.error("댓글 작성에 실패했습니다.", {
+        position: "top-center",
+      });
+    }
+  })
   const [content, setContent] = useState("");
 
   const handleSubmitClick = () => {
     if (content.trim() === "") return;
 
     // API 요청
+    createComment({
+      postId,
+      content,
+    });
   }
 
   return (
